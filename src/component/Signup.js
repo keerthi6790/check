@@ -53,7 +53,10 @@ export default function SignUp() {
   };
   function storageElement(){
       var object={'email':document.getElementById('email').value,'password':document.getElementById('password').value}
-      localStorage.setItem('login',JSON.stringify(object));
+      var arrayList=[];
+      arrayList.push(JSON.stringify(object));
+      console.log(arrayList);
+      localStorage.setItem('login',arrayList);
   }
   function makeEmpty() {
     document.getElementById("email").value = "";

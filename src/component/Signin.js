@@ -12,7 +12,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
-
+import {Alert,AlertTitle} from '@mui/material'
 const theme = createTheme();
 
 export default function SignIn() {
@@ -26,9 +26,10 @@ export default function SignIn() {
     const login=JSON.parse(localStorage.getItem('login'));
     if(login.email===d.get('email')&&login.password===d.get('password')){
       alert("Success");
+      window.location.href="/dashboard"
     }
     else{
-      alert("Unsuccess")
+      document.getElementById("alert").style.display="block"
     }
   }
   return (
@@ -55,6 +56,10 @@ export default function SignIn() {
             noValidate
             sx={{ mt: 1 }}
           >
+          <Alert severity="error" id="alert">
+            <AlertTitle>Error</AlertTitle>
+            Check Your — <strong>Email Address/Password</strong>
+          </Alert>
             <TextField
               margin="normal"
               required

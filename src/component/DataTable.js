@@ -1,4 +1,4 @@
-import * as React from "react";
+import  React, { useState,useEffect } from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -21,7 +21,7 @@ import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
-import Data from "../Data/data.json";
+import axios from 'axios';
 
 function createData(SourceIP, DestinagationIP, Sent_Time, Received_Time, Node_ID,Temperature,Humidity, Light,Sound,PIR,Distance, Size, Anomaly) {
     return {
@@ -40,11 +40,6 @@ function createData(SourceIP, DestinagationIP, Sent_Time, Received_Time, Node_ID
     Anomaly
   };
 }
-const rows = 
-   Data.map((x)=>{
-      return createData(x.SourceIP,x.DestinagationIP,x.SentTime,x.ReceivedTime,x.NodeID,x.Temperature,x.Humidity,x.Light,x.Sound,x.PIR,x.Distance,x.Size,x.anomaly);
-    });
-console.log(rows);
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
     return -1;
@@ -283,7 +278,22 @@ export default function EnhancedTable() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-
+  const [TableData, setTableData] = useState([]);
+  useEffect(() => {
+    axios
+      .get("https://api.jsonbin.io/b/61e4f57eba87c130e3e98fc7/1")   //jsonBin
+      .then( (d) => {
+        setTableData(d.data.data)
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  },[]);
+console.log(TableData);
+const rows = TableData.map((x)=>{
+   return createData(x.SourceIP,x.DestinagationIP,x.SentTime,x.ReceivedTime,x.NodeID,x.Temperature,x.Humidity,x.Light,x.Sound,x.PIR,x.Distance,x.Size,x.anomaly);
+ });
+console.log(rows);
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
