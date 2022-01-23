@@ -1,41 +1,34 @@
-import React, { useState } from "react";
+import * as React from "react";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
+import SubLog from "./items/Log";
+import SubAlarm from "./items/subAlarm";
+import SubGateway from "./items/Gateway";
 import NetworkCheckIcon from "@mui/icons-material/NetworkCheck";
 import AltRouteIcon from "@mui/icons-material/AltRoute";
-import DeviceHubIcon from "@mui/icons-material/DeviceHub";
-import LockOpenIcon from "@mui/icons-material/LockOpen";
-import DataObjectIcon from "@mui/icons-material/DataObject";
-import NetworkWifiIcon from "@mui/icons-material/NetworkWifi";
-import EditNotificationsIcon from "@mui/icons-material/EditNotifications";
-import LogoutIcon from "@mui/icons-material/Logout";
-import { Grid, Typography } from "@mui/material";
+import DevicesIcon from "@mui/icons-material/Devices";
+import VpnKeyIcon from "@mui/icons-material/VpnKey";
+import AlarmIcon from "@mui/icons-material/Alarm";
+import { Link } from "react-router-dom";
+import { Assignment, Logout } from "@mui/icons-material";
+import { Grid, ListSubheader } from "@mui/material";
+export  function ListItems() {
 
-export const MainListItems = () => {
   const login=JSON.parse(localStorage.getItem('login'));
-  const [countlogs, setcountLogs] = useState(0);
-  const [countalarm, setcountAlarm] = useState(0);
-  function changeLog() {
-    if (countlogs === 1) {
-      document.getElementById("logs").style.display = "block";
-      setcountLogs(0);
-    } else {
-      document.getElementById("logs").style.display = "none";
-      setcountLogs(1);
-    }
+  const [list, setList] = React.useState(false);
+  const [alarm, setAlarm] = React.useState(false);
+  const [gateway, setGateway] = React.useState(false);
+
+ 
+  function handleList() {
+    setList(!list);
   }
-  function changeAlarm() {
-    if (countalarm === 1) {
-      document.getElementById("alarm").style.display = "block";
-      setcountAlarm(0);
-    } else {
-      document.getElementById("alarm").style.display = "none";
-      setcountAlarm(1);
-    }
+  function handleAlarm() {
+    setAlarm(!alarm);
   }
-  function setLogout(){
-    window.location.href="/"
+  function handleGateway() {
+    setGateway(!gateway);
   }
   return (
     <Grid
@@ -46,80 +39,56 @@ export const MainListItems = () => {
     alignItems="start"
   >
       <Grid item>
-        <ListItem button onClick={()=>{window.location.href='/dashboard'}}>
-          <ListItemIcon>
-            <NetworkCheckIcon color="primary" />
-          </ListItemIcon>
-          <ListItemText primary="Network Monitoring" />
-        </ListItem>
-        <ListItem button>
+        <Link to="/dashboard">
+          <ListItem button>
+            <ListItemIcon>
+              <NetworkCheckIcon color="primary" />
+            </ListItemIcon>
+            <ListItemText primary="Network Monitoring" />
+          </ListItem>
+        </Link>
+        <ListItem button onClick={handleGateway}>
           <ListItemIcon>
             <AltRouteIcon color="primary" />
           </ListItemIcon>
           <ListItemText primary="Gateway Configuration" />
         </ListItem>
+        {gateway ? <SubGateway /> : null}
         <ListItem button>
           <ListItemIcon>
-            <DeviceHubIcon color="primary" />
+            <DevicesIcon color="primary" />
           </ListItemIcon>
           <ListItemText primary="Device Management" />
         </ListItem>
-        <ListItem button onClick={changeLog}>
+        <ListItem button onClick={handleList}>
           <ListItemIcon>
-            <LockOpenIcon color="primary" />
+            <VpnKeyIcon color="primary" />
           </ListItemIcon>
-          <ListItemText primary="Logs" />
+          <ListItemText primary="Log" />
         </ListItem>
-        <div id="logs" style={{ display: "none", marginLeft: "30px" }}>
-          <ListItem button  onClick={()=>{window.location.href='/networklogs'}}>
-            <ListItemIcon>
-              <DataObjectIcon color="warning" />
-            </ListItemIcon>
-            <ListItemText primary="Data Logs" />
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <NetworkWifiIcon color="warning" />
-            </ListItemIcon>
-            <ListItemText primary="Network Logs" />
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <DeviceHubIcon color="warning" />
-            </ListItemIcon>
-            <ListItemText primary="Device Logs" />
-          </ListItem>
-        </div>
-        <ListItem button onClick={changeAlarm}>
+        {list ? <SubLog /> : null}
+        <ListItem button onClick={handleAlarm}>
           <ListItemIcon>
-            <EditNotificationsIcon color="primary" />
+            <AlarmIcon color="primary" />
           </ListItemIcon>
-          <ListItemText primary="Alarms" />
-        </ListItem>{" "}
-        <div id="alarm" style={{ display: "none", marginLeft: "30px" }}>
-          <ListItem>
-            <ListItemIcon>
-              <DataObjectIcon color="warning" />
-            </ListItemIcon>
-            <ListItemText primary="Data Alarm" />
-          </ListItem>
-          <ListItem button>
-            <ListItemIcon>
-              <NetworkWifiIcon color="warning" />
-            </ListItemIcon>
-            <ListItemText primary="Network Alarm" />
-          </ListItem>
-        </div>
+          <ListItemText primary="Alarm" />
+        </ListItem>
+        {alarm ? <SubAlarm /> : null}
       </Grid>
       <Grid item>
-        <div style={{padding:"0px 15px"}}>You signed as <br/><b>{login.email}</b></div>
-        <ListItem button onClick={setLogout}>
-          <ListItemIcon>
-            <LogoutIcon color="warning" />
-          </ListItemIcon>
-          <ListItemText primary="Logout" />
-        </ListItem>
+        <div style={{ padding: "0px 15px" }}>
+          You signed as <br />
+          <b>{login.email}</b>
+        </div>
+        <Link to="/">
+          <ListItem button>
+            <ListItemIcon>
+              <Logout color="warning" />
+            </ListItemIcon>
+            <ListItemText primary="Logout" />
+          </ListItem>
+        </Link>
       </Grid>
     </Grid>
   );
-};
+}

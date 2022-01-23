@@ -17,4 +17,21 @@
   #firstandlast {
     display: none;
   }
-  
+  .MuiTypography-root {
+    text-transform: none;
+  }
+  a{
+    color: black;
+    text-decoration: none;
+  }
+#basic-button{
+  width: 300px;
+  gap: 0px;
+  justify-content: flex-start;
+}
+.MuiList-root{
+  width: 200px;
+}
+MuiBox-root{
+  background-color: #f5f5f5;
+}

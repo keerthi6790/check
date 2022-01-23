@@ -12,6 +12,10 @@ function App() {
          <Route path="/signin" element={<Signin/>}/>
          <Route path="/dashboard" element={<Dashboard/>}/>
          <Route path='/networklogs' element={<Dashboard/>} />
+         <Route path='/appendRule' element={<Dashboard/>}/>
+         <Route path="/insertRule" element={<Dashboard/>}/>
+         <Route path='/attack' element={<Dashboard/>}/>
+         <Route path='/delete' element={<Dashboard/>}/>
          <Route path="*" element={<Error/>}/>
        </Routes>
     </BrowserRouter>

@@ -1,0 +1,30 @@
+.wholeContainer{
+    display: grid;
+    justify-content: center;
+    align-items: center;
+}
+.flexStyle{
+    padding: 10px 5px;
+    display: grid;
+    grid-template-columns: 0.8fr 1fr 1fr;
+    align-items: center;
+}
+.error{
+    padding-top: 4px;
+    color: red;
+    font-size: 14px;
+    font-weight: 300;
+    display: none;
+}
+.gridStyle{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+}
+.deleteGrid{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+}
+Button{
+    margin: 10px 5px;
+}
