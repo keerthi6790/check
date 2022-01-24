@@ -21,7 +21,8 @@ import { InsertRule } from "../component/Modal/InsertRule";
 import { Attack } from "../component/Modal/Attack";
 import DeleteRule from "../component/Modal/DeleteRule";
 import { Container, Link } from "@mui/material";
-
+import LoginData from "../component/LoginData";
+import NetworkLogs from '../component/Networklogs';
 
 function checkRender() {
   if (window.location.pathname.includes("/dashboard")) {
@@ -37,6 +38,12 @@ function checkRender() {
   }
   else if(window.location.pathname.includes("/delete")){
     return <DeleteRule/>;
+  }
+  else if(window.location.pathname.includes("/loginData")){
+    return <LoginData/>
+  }
+  else if(window.location.pathname.includes("/logs")){
+    return <NetworkLogs/>
   }
 }
 const drawerWidth = 240;

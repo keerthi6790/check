@@ -15,7 +15,7 @@ export default function SubLog() {
         <ListItemText primary="Data Log" />
       </ListItem>
       </Link>
-      <Link to='/'>
+      <Link to='/logs'>
       <ListItem button>
         <ListItemIcon>
           <DashboardIcon />
@@ -23,7 +23,7 @@ export default function SubLog() {
         <ListItemText primary="Network Log" />
       </ListItem>
       </Link>
-      <Link to='/'>
+      <Link to='/loginData'>
       <ListItem button>
         <ListItemIcon>
           <DashboardIcon />
