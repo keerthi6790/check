@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useCallback} from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -22,29 +22,30 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
 import { Login } from "../Data/Login";
+import LoginDataFilter from "./Filter/LoginDataFilter";
 function createData(
-  Attempt,
+  SourceIP,
   DestinationIP,
+  SourcePort,
   DestinationPort,
-  LogOutTime,
+  SourceMAC,
   LoginDate,
   LoginInTime,
-  SourceIP,
-  SourceMAC,
-  SourcePort,
-  Status
+  LogOutTime,
+  Status,
+  Attempt
 ) {
   return {
-    Attempt,
+    SourceIP,
     DestinationIP,
+    SourcePort,
     DestinationPort,
-    LogOutTime,
+    SourceMAC,
     LoginDate,
     LoginInTime,
-    SourceIP,
-    SourceMAC,
-    SourcePort,
-    Status
+    LogOutTime,
+    Status,
+    Attempt,
   };
 }
 function descendingComparator(a, b, orderBy) {
@@ -79,10 +80,10 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: "Attempt",
+    id: "sourceIP",
     numeric: false,
     disablePadding: true,
-    label: "Attempt",
+    label: "sourceIP",
   },
   {
     id: "DestinationIP",
@@ -91,16 +92,22 @@ const headCells = [
     label: "DestinationIP",
   },
   {
+    id: "SourcePort",
+    numeric: false,
+    disablePadding: false,
+    label: "SourcePort",
+  },
+  {
     id: "DestinationPort",
     numeric: false,
     disablePadding: false,
     label: "DestinationPort",
   },
   {
-    id: "LogOutTime",
+    id: "SourceMAC",
     numeric: false,
     disablePadding: false,
-    label: "LogOutTime",
+    label: "SourceMAC",
   },
   {
     id: "LoginDate",
@@ -115,28 +122,22 @@ const headCells = [
     label: "LoginInTime",
   },
   {
-    id: "SourceIP",
+    id: "LogOutTime",
     numeric: false,
     disablePadding: false,
-    label: "SourceIP",
-  },
-  {
-    id: "SourceMAC",
-    numeric: false,
-    disablePadding: false,
-    label: "SourceMAC",
-  },
-  {
-    id: "SourcePort",
-    numeric: false,
-    disablePadding: false,
-    label: "SourcePort",
+    label: "LogOutTime",
   },
   {
     id: "Status",
     numeric: false,
     disablePadding: false,
     label: "Status",
+  },
+  {
+    id: "Attempt",
+    numeric: false,
+    disablePadding: false,
+    label: "Attempt",
   },
 ];
 
@@ -204,7 +205,11 @@ EnhancedTableHead.propTypes = {
 
 const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
-
+  const [openFilter,setOpenFilter]=useState(false);
+  const handleOpen=()=>{
+    setOpenFilter(!openFilter)
+    props.changeState(openFilter)
+  }
   return (
     <Toolbar
       sx={{
@@ -247,7 +252,7 @@ const EnhancedTableToolbar = (props) => {
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
-          <IconButton>
+          <IconButton onClick={handleOpen}>
             <FilterListIcon />
           </IconButton>
         </Tooltip>
@@ -267,23 +272,30 @@ export default function LoginData() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [TableData, setTableData] = useState([]);
-  useEffect(() => {
-    setTableData(Login);
-  }, []);
-  console.log(Login);
-  const rows = TableData.map((x) => {
+  const [finalValue, setFinalValue] = useState(Login);
+  const [show,setShow]=useState(false)
+  
+  const callback = useCallback((finalValue) => {
+    setFinalValue(finalValue);
+    console.log(finalValue);
+  });
+  const stateCallback=useCallback((finalValue)=>{
+    console.log(finalValue);
+    setShow(finalValue)
+  })
+  console.log(finalValue);
+  const rows = finalValue.map((x) => {
     return createData(
-      x.Attempt,
+      x.SourceIP,
       x.DestinationIP,
+      x.SourcePort,
       x.DestinationPort,
-      x.LogOutTime,
+      x.SourceMAC,
       x.LoginDate,
       x.LoginInTime,
-      x.SourceIP,
-      x.SourceMAC,
-      x.SourcePort,
-      x.Status
+      x.LogOutTime,
+      x.Status,
+      x.Attempt
     );
   });
   console.log(rows);
@@ -343,8 +355,10 @@ export default function LoginData() {
 
   return (
     <Box sx={{ width: "100%" }}>
+
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar numSelected={selected.length} changeState={stateCallback}/>
+        {show?<LoginDataFilter data={finalValue} parentCallback={callback}/>: null} 
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -393,17 +407,17 @@ export default function LoginData() {
                         scope="row"
                         padding="none"
                       >
-                        {row.Attempt}
+                        {row.SourceIP}
                       </TableCell>
                       <TableCell align="right">{row.DestinationIP}</TableCell>
+                      <TableCell align="right">{row.SourcePort}</TableCell>
                       <TableCell align="right">{row.DestinationPort}</TableCell>
-                      <TableCell align="right">{row.LogOutTime}</TableCell>
+                      <TableCell align="right">{row.SourceMAC}</TableCell>
                       <TableCell align="right">{row.LoginDate}</TableCell>
                       <TableCell align="right">{row.LoginInTime}</TableCell>
-                      <TableCell align="right">{row.SourceIP}</TableCell>
-                      <TableCell align="right">{row.SourceMAC}</TableCell>
-                      <TableCell align="right">{row.SourcePort}</TableCell>
+                      <TableCell align="right">{row.LogOutTime}</TableCell>
                       <TableCell align="right">{row.Status}</TableCell>
+                      <TableCell align="right">{row.Attempt}</TableCell>
                     </TableRow>
                   );
                 })}

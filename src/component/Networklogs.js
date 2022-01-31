@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useCallback } from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -22,32 +22,33 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
 import {network} from '../Data/Networklogs'
+import NetworkTableFilter from "./Filter/NetworkTableFilter";
 function createData(
-  Acknowledgment,
-  DataSize,
+  Timestamp,
+  SourceIP,
   DestinationIP,
+  Protocol,
+  SourcePort,
   DestinationPort,
   HeaderSize,
-  Protocol,
-  Sequence,
-  SourceIP,
-  SourcePort,
   TTL,
-  Timestamp
+  DataSize,
+  Sequence,
+  Acknowledgment,
 ) {
   return {
-    Acknowledgment,
-    DataSize,
+    Timestamp,
+    SourceIP,
     DestinationIP,
+    Protocol,
+    SourcePort,
     DestinationPort,
     HeaderSize,
-    Protocol,
-    Sequence,
-    SourceIP,
-    SourcePort,
     TTL,
-    Timestamp
-  };
+    DataSize,
+    Sequence,
+    Acknowledgment,
+    };
 }
 function descendingComparator(a, b, orderBy) {
   if (b[orderBy] < a[orderBy]) {
@@ -81,22 +82,34 @@ function stableSort(array, comparator) {
 
 const headCells = [
   {
-    id: "Acknowledgment",
+    id: "Timestamp",
     numeric: false,
     disablePadding: true,
-    label: "Acknowledgment",
+    label: "Timestamp",
   },
   {
-    id: "DataSize",
+    id: "SourceIP",
     numeric: false,
     disablePadding: false,
-    label: "DataSize",
+    label: "SourceIP",
   },
   {
     id: "DestinationIP",
     numeric: false,
     disablePadding: false,
     label: "DestinationIP",
+  },
+  {
+    id: "Protocol",
+    numeric: false,
+    disablePadding: false,
+    label: "Protocol",
+  },
+  {
+    id: "SourcePort",
+    numeric: false,
+    disablePadding: false,
+    label: "SourcePort",
   },
   {
     id: "DestinationPort",
@@ -111,10 +124,16 @@ const headCells = [
     label: "HeaderSize",
   },
   {
-    id: "Protocol",
+    id: "TTL",
     numeric: false,
     disablePadding: false,
-    label: "Protocol",
+    label: "TTL",
+  },
+  {
+    id: "DataSize",
+    numeric: false,
+    disablePadding: false,
+    label: "DataSize",
   },
   {
     id: "Sequence",
@@ -123,28 +142,10 @@ const headCells = [
     label: "Sequence",
   },
   {
-    id: "SourceIP",
+    id: "Acknowledgment",
     numeric: false,
     disablePadding: false,
-    label: "SourceIP",
-  },
-  {
-    id: "SourcePort",
-    numeric: false,
-    disablePadding: false,
-    label: "SourcePort",
-  },
-  {
-    id: "TTL",
-    numeric: false,
-    disablePadding: false,
-    label: "TTL",
-  },
-  {
-    id: "Timestamp",
-    numeric: false,
-    disablePadding: false,
-    label: "TimeStamp",
+    label: "Acknowledgment",
   },
 ];
 
@@ -212,6 +213,11 @@ EnhancedTableHead.propTypes = {
 
 const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
+  const [openFilter,setOpenFilter]=useState(false);
+  const handleOpen=()=>{
+    setOpenFilter(!openFilter)
+    props.changeState(openFilter)
+  }
 
   return (
     <Toolbar
@@ -255,7 +261,7 @@ const EnhancedTableToolbar = (props) => {
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
-          <IconButton>
+          <IconButton onClick={handleOpen}>
             <FilterListIcon />
           </IconButton>
         </Tooltip>
@@ -275,24 +281,31 @@ export default function NetworkLogs() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [TableData, setTableData] = useState([]);
-  useEffect(() => {
-    setTableData(network);
-  }, []);
-  console.log(network)
-  const rows = TableData.map((x) => {
+  const [finalValue, setFinalValue] = useState(network);
+  const [show,setShow]=useState(false)
+  
+  const callback = useCallback((finalValue) => {
+    setFinalValue(finalValue);
+    console.log(finalValue);
+  });
+  const stateCallback=useCallback((finalValue)=>{
+    console.log(finalValue);
+    setShow(finalValue)
+  })
+  console.log(finalValue);
+  const rows = finalValue.map((x) => {
     return createData(
-      x.Acknowledgment,
-      x.DataSize,
+      x.Timestamp,
+      x.SourceIP,
       x.DestinationIP,
+      x.Protocol,
+      x.SourcePort,
       x.DestinationPort,
       x.HeaderSize,
-      x.Protocol,
-      x.Sequence,
-      x.SourceIP,
-      x.SourcePort,
       x.TTL,
-      x.Timestamp
+      x.DataSize,
+      x.Sequence,
+      x.Acknowledgment
     );
   });
   console.log(rows);
@@ -353,7 +366,8 @@ export default function NetworkLogs() {
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar numSelected={selected.length} changeState={stateCallback}/>
+        {show?<NetworkTableFilter data={finalValue} parentCallback={callback}/>: null} 
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -402,18 +416,18 @@ export default function NetworkLogs() {
                         scope="row"
                         padding="none"
                       >
-                        {row.Acknowledgment}
+                        {row.Timestamp}
                       </TableCell>
-                      <TableCell align="right">{row.DataSize}</TableCell>
+                      <TableCell align="right">{row.SourceIP}</TableCell>
                       <TableCell align="right">{row.DestinationIP}</TableCell>
+                      <TableCell align="right">{row.Protocol}</TableCell>
+                      <TableCell align="right">{row.SourcePort}</TableCell>
                       <TableCell align="right">{row.DestinationPort}</TableCell>
                       <TableCell align="right">{row.HeaderSize}</TableCell>
-                      <TableCell align="right">{row.Protocol}</TableCell>
-                      <TableCell align="right">{row.Sequence}</TableCell>
-                      <TableCell align="right">{row.SourceIP}</TableCell>
-                      <TableCell align="right">{row.SourcePort}</TableCell>
                       <TableCell align="right">{row.TTL}</TableCell>
-                      <TableCell align="right">{row.Timestamp}</TableCell>
+                      <TableCell align="right">{row.DataSize}</TableCell>
+                      <TableCell align="right">{row.Sequence}</TableCell>
+                      <TableCell align="right">{row.Acknowledgment}</TableCell>
                     </TableRow>
                   );
                 })}

@@ -1,4 +1,4 @@
-import  React, { useState,useEffect } from "react";
+import React, { useState, useEffect, useCallback} from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -21,10 +21,25 @@ import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
-import axios from 'axios';
+import axios from "axios";
+import DataTableFilter from "./Filter/DataTableFilter";
 
-function createData(SourceIP, DestinagationIP, Sent_Time, Received_Time, Node_ID,Temperature,Humidity, Light,Sound,PIR,Distance, Size, Anomaly) {
-    return {
+function createData(
+  SourceIP,
+  DestinagationIP,
+  Sent_Time,
+  Received_Time,
+  Node_ID,
+  Temperature,
+  Humidity,
+  Light,
+  Sound,
+  PIR,
+  Distance,
+  Size,
+  Anomaly
+) {
+  return {
     SourceIP,
     DestinagationIP,
     Sent_Time,
@@ -37,7 +52,7 @@ function createData(SourceIP, DestinagationIP, Sent_Time, Received_Time, Node_ID
     PIR,
     Distance,
     Size,
-    Anomaly
+    Anomaly,
   };
 }
 function descendingComparator(a, b, orderBy) {
@@ -69,7 +84,6 @@ function stableSort(array, comparator) {
   });
   return stabilizedThis.map((el) => el[0]);
 }
-
 const headCells = [
   {
     id: "SourceIP",
@@ -102,54 +116,56 @@ const headCells = [
     label: "NodeID",
   },
   {
-      id:"Temperature",
-      numeric: false,
-      disablePadding: false,
-      label: "Temperature"
+    id: "Temperature",
+    numeric: false,
+    disablePadding: false,
+    label: "Temperature",
   },
   {
-      id:"Humidity",
-      numeric: false,
-      disablePadding: false,
-      label: "Humidity"
+    id: "Humidity",
+    numeric: false,
+    disablePadding: false,
+    label: "Humidity",
   },
   {
-      id:"Light",
-      numeric: false,
-      disablePadding: false,
-      label: "Light"
+    id: "Light",
+    numeric: false,
+    disablePadding: false,
+    label: "Light",
   },
   {
-      id:"Sound",
-      numeric: false,
-      disablePadding: false,
-      label: "Sound"
+    id: "Sound",
+    numeric: false,
+    disablePadding: false,
+    label: "Sound",
   },
   {
-      id:"PIR",
-      numeric: false,
-      disablePadding: false,
-      label: "PIR"
+    id: "PIR",
+    numeric: false,
+    disablePadding: false,
+    label: "PIR",
   },
   {
-      id:"Distance",
-      numeric: false,
-      disablePadding: false,
-      label: "Distance"
+    id: "Distance",
+    numeric: false,
+    disablePadding: false,
+    label: "Distance",
   },
   {
-      id:"Size",
-      numeric: false,
-      disablePadding: false,
-      label: "Size"
+    id: "Size",
+    numeric: false,
+    disablePadding: false,
+    label: "Size",
   },
   {
-      id:"anomaly",
-      numeric: false,
-      disablePadding: false,
-      label: "anomaly"
-  }
+    id: "anomaly",
+    numeric: false,
+    disablePadding: false,
+    label: "anomaly",
+  },
 ];
+
+
 
 function EnhancedTableHead(props) {
   const {
@@ -163,7 +179,6 @@ function EnhancedTableHead(props) {
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
-
   return (
     <TableHead>
       <TableRow>
@@ -213,9 +228,15 @@ EnhancedTableHead.propTypes = {
   rowCount: PropTypes.number.isRequired,
 };
 
+
+
 const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
-
+  const [openFilter,setOpenFilter]=useState(false);
+  const handleOpen=()=>{
+    setOpenFilter(!openFilter)
+    props.changeState(openFilter)
+  }
   return (
     <Toolbar
       sx={{
@@ -258,7 +279,7 @@ const EnhancedTableToolbar = (props) => {
         </Tooltip>
       ) : (
         <Tooltip title="Filter list">
-          <IconButton>
+          <IconButton onClick={handleOpen}>
             <FilterListIcon />
           </IconButton>
         </Tooltip>
@@ -278,22 +299,44 @@ export default function EnhancedTable() {
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [TableData, setTableData] = useState([]);
-  useEffect(() => {
+  const [finalValue, setFinalValue] = useState([]);
+  const [show,setShow]=useState(false)
+  React.useEffect(() => {
     axios
-      .get("https://api.jsonbin.io/b/61e4f57eba87c130e3e98fc7/1")   //jsonBin
-      .then( (d) => {
-        setTableData(d.data.data)
+      .get("https://api.jsonbin.io/b/61e4f57eba87c130e3e98fc7/1") //jsonBin
+      .then((d) => {
+        setFinalValue(d.data.data);
       })
       .catch((err) => {
         console.log(err);
       });
-  },[]);
-console.log(TableData);
-const rows = TableData.map((x)=>{
-   return createData(x.SourceIP,x.DestinagationIP,x.SentTime,x.ReceivedTime,x.NodeID,x.Temperature,x.Humidity,x.Light,x.Sound,x.PIR,x.Distance,x.Size,x.anomaly);
- });
-console.log(rows);
+  }, []);
+  const callback = useCallback((finalValue) => {
+    setFinalValue(finalValue);
+    console.log(finalValue);
+  });
+  const stateCallback=useCallback((finalValue)=>{
+    console.log(finalValue);
+    setShow(finalValue)
+  })
+  console.log(finalValue);
+  const rows = finalValue.map((x) => {
+    return createData(
+      x.SourceIP,
+      x.DestinagationIP,
+      x.SentTime,
+      x.ReceivedTime,
+      x.NodeID,
+      x.Temperature,
+      x.Humidity,
+      x.Light,
+      x.Sound,
+      x.PIR,
+      x.Distance,
+      x.Size,
+      x.anomaly
+    );
+  });
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -343,15 +386,16 @@ console.log(rows);
   };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
-
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-
+    
   return (
     <Box sx={{ width: "100%" }}>
       <Paper sx={{ width: "100%", mb: 2 }}>
-        <EnhancedTableToolbar numSelected={selected.length} />
+        <EnhancedTableToolbar numSelected={selected.length} changeState={stateCallback}/>
+        {/* //DataTableFiter */}
+        {show?<DataTableFilter data={finalValue} parentCallback={callback}/>: null} 
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -374,7 +418,6 @@ console.log(rows);
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.SourceIP);
                   const labelId = `enhanced-table-checkbox-${index}`;
-
                   return (
                     <TableRow
                       hover
