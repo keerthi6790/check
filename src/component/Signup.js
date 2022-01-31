@@ -5,7 +5,6 @@ import CssBaseline from "@mui/material/CssBaseline";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -14,6 +13,8 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import Alert from "@mui/material/Alert";
 import { AlertTitle } from "@mui/material";
+import { Link } from "react-router-dom";
+
 const theme = createTheme();
 
 export default function SignUp() {
@@ -98,11 +99,8 @@ export default function SignUp() {
             Password is <strong>to small</strong>
           </Alert>
           <Alert severity="success" id="sucessful">
-            <AlertTitle>Success</AlertTitle>
             Account is created Successfully &nbsp;
-            <Link href="/signin">
-              <strong>check it out!</strong>
-            </Link>
+              check it out!
           </Alert>
           <Box
             component="form"
@@ -165,7 +163,7 @@ export default function SignUp() {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="/signin" variant="body2">
+                <Link to="/signin" className="signinButton" >
                   Already have an account? Sign in
                 </Link>
               </Grid>

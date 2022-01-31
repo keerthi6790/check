@@ -16,6 +16,8 @@ function App() {
          <Route path="/insertRule" element={<Dashboard/>}/>
          <Route path='/attack' element={<Dashboard/>}/>
          <Route path='/delete' element={<Dashboard/>}/>
+         <Route path='/logindata' element={<Dashboard/>}/>
+         <Route path='/logs' element={<Dashboard/>}/>
          <Route path="*" element={<Error/>}/>
        </Routes>
     </BrowserRouter>

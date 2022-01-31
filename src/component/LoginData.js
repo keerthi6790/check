@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback} from "react";
+import React, { useState, useEffect ,useCallback} from "react";
 import PropTypes from "prop-types";
 import { alpha } from "@mui/material/styles";
 import Box from "@mui/material/Box";
@@ -21,38 +21,31 @@ import Switch from "@mui/material/Switch";
 import DeleteIcon from "@mui/icons-material/Delete";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { visuallyHidden } from "@mui/utils";
-import axios from "axios";
-import DataTableFilter from "./Filter/DataTableFilter";
-
+import { Login } from "../Data/Login";
+import LoginDataFilter from "./Filter/LoginDataFilter";
 function createData(
   SourceIP,
-  DestinagationIP,
-  Sent_Time,
-  Received_Time,
-  Node_ID,
-  Temperature,
-  Humidity,
-  Light,
-  Sound,
-  PIR,
-  Distance,
-  Size,
-  Anomaly
+  DestinationIP,
+  SourcePort,
+  DestinationPort,
+  SourceMAC,
+  LoginDate,
+  LoginInTime,
+  LogOutTime,
+  Status,
+  Attempt
 ) {
   return {
     SourceIP,
-    DestinagationIP,
-    Sent_Time,
-    Received_Time,
-    Node_ID,
-    Temperature,
-    Humidity,
-    Light,
-    Sound,
-    PIR,
-    Distance,
-    Size,
-    Anomaly,
+    DestinationIP,
+    SourcePort,
+    DestinationPort,
+    SourceMAC,
+    LoginDate,
+    LoginInTime,
+    LogOutTime,
+    Status,
+    Attempt,
   };
 }
 function descendingComparator(a, b, orderBy) {
@@ -84,12 +77,13 @@ function stableSort(array, comparator) {
   });
   return stabilizedThis.map((el) => el[0]);
 }
+
 const headCells = [
   {
-    id: "SourceIP",
+    id: "sourceIP",
     numeric: false,
     disablePadding: true,
-    label: "SourceIP",
+    label: "sourceIP",
   },
   {
     id: "DestinationIP",
@@ -98,74 +92,54 @@ const headCells = [
     label: "DestinationIP",
   },
   {
-    id: "SentTime",
+    id: "SourcePort",
     numeric: false,
     disablePadding: false,
-    label: "SentTime",
+    label: "SourcePort",
   },
   {
-    id: "ReceivedTime",
+    id: "DestinationPort",
     numeric: false,
     disablePadding: false,
-    label: "ReceivedTime",
+    label: "DestinationPort",
   },
   {
-    id: "NodeID",
+    id: "SourceMAC",
     numeric: false,
     disablePadding: false,
-    label: "NodeID",
+    label: "SourceMAC",
   },
   {
-    id: "Temperature",
+    id: "LoginDate",
     numeric: false,
     disablePadding: false,
-    label: "Temperature",
+    label: "LoginDate",
   },
   {
-    id: "Humidity",
+    id: "LoginInTime",
     numeric: false,
     disablePadding: false,
-    label: "Humidity",
+    label: "LoginInTime",
   },
   {
-    id: "Light",
+    id: "LogOutTime",
     numeric: false,
     disablePadding: false,
-    label: "Light",
+    label: "LogOutTime",
   },
   {
-    id: "Sound",
+    id: "Status",
     numeric: false,
     disablePadding: false,
-    label: "Sound",
+    label: "Status",
   },
   {
-    id: "PIR",
+    id: "Attempt",
     numeric: false,
     disablePadding: false,
-    label: "PIR",
-  },
-  {
-    id: "Distance",
-    numeric: false,
-    disablePadding: false,
-    label: "Distance",
-  },
-  {
-    id: "Size",
-    numeric: false,
-    disablePadding: false,
-    label: "Size",
-  },
-  {
-    id: "anomaly",
-    numeric: false,
-    disablePadding: false,
-    label: "anomaly",
+    label: "Attempt",
   },
 ];
-
-
 
 function EnhancedTableHead(props) {
   const {
@@ -179,6 +153,7 @@ function EnhancedTableHead(props) {
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
+
   return (
     <TableHead>
       <TableRow>
@@ -227,8 +202,6 @@ EnhancedTableHead.propTypes = {
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
 };
-
-
 
 const EnhancedTableToolbar = (props) => {
   const { numSelected } = props;
@@ -292,25 +265,16 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable() {
+export default function LoginData() {
   const [order, setOrder] = React.useState("asc");
   const [orderBy, setOrderBy] = React.useState("calories");
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
   const [dense, setDense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
-  const [finalValue, setFinalValue] = useState([]);
+  const [finalValue, setFinalValue] = useState(Login);
   const [show,setShow]=useState(false)
-  React.useEffect(() => {
-    axios
-      .get("https://api.jsonbin.io/b/61e4f57eba87c130e3e98fc7/1") //jsonBin
-      .then((d) => {
-        setFinalValue(d.data.data);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-  }, []);
+  
   const callback = useCallback((finalValue) => {
     setFinalValue(finalValue);
     console.log(finalValue);
@@ -323,20 +287,18 @@ export default function EnhancedTable() {
   const rows = finalValue.map((x) => {
     return createData(
       x.SourceIP,
-      x.DestinagationIP,
-      x.SentTime,
-      x.ReceivedTime,
-      x.NodeID,
-      x.Temperature,
-      x.Humidity,
-      x.Light,
-      x.Sound,
-      x.PIR,
-      x.Distance,
-      x.Size,
-      x.anomaly
+      x.DestinationIP,
+      x.SourcePort,
+      x.DestinationPort,
+      x.SourceMAC,
+      x.LoginDate,
+      x.LoginInTime,
+      x.LogOutTime,
+      x.Status,
+      x.Attempt
     );
   });
+  console.log(rows);
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
@@ -386,16 +348,17 @@ export default function EnhancedTable() {
   };
 
   const isSelected = (name) => selected.indexOf(name) !== -1;
+
   // Avoid a layout jump when reaching the last page with empty rows.
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
-    
+
   return (
     <Box sx={{ width: "100%" }}>
+
       <Paper sx={{ width: "100%", mb: 2 }}>
         <EnhancedTableToolbar numSelected={selected.length} changeState={stateCallback}/>
-        {/* //DataTableFiter */}
-        {show?<DataTableFilter data={finalValue} parentCallback={callback}/>: null} 
+        {show?<LoginDataFilter data={finalValue} parentCallback={callback}/>: null} 
         <TableContainer>
           <Table
             sx={{ minWidth: 750 }}
@@ -418,6 +381,7 @@ export default function EnhancedTable() {
                 .map((row, index) => {
                   const isItemSelected = isSelected(row.SourceIP);
                   const labelId = `enhanced-table-checkbox-${index}`;
+
                   return (
                     <TableRow
                       hover
@@ -425,7 +389,7 @@ export default function EnhancedTable() {
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.SourceIP}
+                      key={row.Attempt}
                       selected={isItemSelected}
                     >
                       <TableCell padding="checkbox">
@@ -445,18 +409,15 @@ export default function EnhancedTable() {
                       >
                         {row.SourceIP}
                       </TableCell>
-                      <TableCell align="right">{row.DestinagationIP}</TableCell>
-                      <TableCell align="right">{row.Sent_Time}</TableCell>
-                      <TableCell align="right">{row.Received_Time}</TableCell>
-                      <TableCell align="right">{row.Node_ID}</TableCell>
-                      <TableCell align="right">{row.Temperature}</TableCell>
-                      <TableCell align="right">{row.Humidity}</TableCell>
-                      <TableCell align="right">{row.Light}</TableCell>
-                      <TableCell align="right">{row.Sound}</TableCell>
-                      <TableCell align="right">{row.PIR}</TableCell>
-                      <TableCell align="right">{row.Distance}</TableCell>
-                      <TableCell align="right">{row.Size}</TableCell>
-                      <TableCell align="right">{row.Anomaly}</TableCell>
+                      <TableCell align="right">{row.DestinationIP}</TableCell>
+                      <TableCell align="right">{row.SourcePort}</TableCell>
+                      <TableCell align="right">{row.DestinationPort}</TableCell>
+                      <TableCell align="right">{row.SourceMAC}</TableCell>
+                      <TableCell align="right">{row.LoginDate}</TableCell>
+                      <TableCell align="right">{row.LoginInTime}</TableCell>
+                      <TableCell align="right">{row.LogOutTime}</TableCell>
+                      <TableCell align="right">{row.Status}</TableCell>
+                      <TableCell align="right">{row.Attempt}</TableCell>
                     </TableRow>
                   );
                 })}
